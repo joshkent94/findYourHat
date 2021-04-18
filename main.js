@@ -1,12 +1,11 @@
 const prompt = require('prompt-sync')({sigint: true});
-const term = require('terminal-kit').terminal;
 
 const hat = '^';
 const hole = 'O';
 const fieldCharacter = '░';
 const pathCharacter = '*';
 const validDirections = ['up', 'down', 'left', 'right'];
-const difficulties = ['Easy', 'Intermediate', 'Hard'];
+const difficulties = ['easy', 'intermediate', 'hard'];
 const validCharacters = [hole, fieldCharacter];
 let gameEnd = false;
 let startTime = 0;
@@ -59,21 +58,21 @@ class Field {
         // checks whether the generated field has more than a certain number of
         // holes and keeps generating the field until it doesn't
         const generateEasyField = (arr, rows, cols) => {
-            while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*25 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*20) {
-                arr = fieldCreation(rows, cols);
-            };
-            return arr;
-        }
-
-        const generateIntermediateField = (arr, rows, cols) => {
             while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*30 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*25) {
                 arr = fieldCreation(rows, cols);
             };
             return arr;
         }
 
-        const generateHardField = (arr, rows, cols) => {
+        const generateIntermediateField = (arr, rows, cols) => {
             while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*35 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*30) {
+                arr = fieldCreation(rows, cols);
+            };
+            return arr;
+        }
+
+        const generateHardField = (arr, rows, cols) => {
+            while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*40 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*35) {
                 arr = fieldCreation(rows, cols);
             };
             return arr;
@@ -93,6 +92,7 @@ class Field {
 }
 
 // returns a random value between 10 and 20 to be used for the field size
+// no longer used, field size set to 12 * 12
 const fieldSize = () => {
     let size = Math.floor(Math.random() * 21);
     while(size < 10) {
@@ -116,7 +116,7 @@ let numberOfHoles = (arr, rows, cols) => {
 
 // ask for a direction until a valid direction is given
 const askDirection = () => {
-    let direction = prompt('Which way would you like to go, up, down, left or right? ')
+    let direction = prompt('Which way would you like to go, up, down, left or right? ');
 
     while(!validDirections.includes(direction.toLowerCase())) {
         direction = prompt('Make sure to choose a direction. Which way do you want to go? ');
@@ -127,18 +127,12 @@ const askDirection = () => {
 
 // ask the player for a difficulty until a valid difficulty is given
 const askDifficulty = () => {
-    let difficulty = 0;
-    term.singleColumnMenu(difficulties, function( error , response ) {
-        term( '\n' ).eraseLineAfter.green(
-            "#%s selected: %s (%s,%s)\n" ,
-            response.selectedIndex ,
-            response.selectedText ,
-            response.x ,
-            response.y
-        ) ;
-        process.exit() ;
-    } ) ;
-    ;
+    let difficulty = prompt('Which difficulty would you like to play on, easy, intermediate or hard? ');
+
+    while(!difficulties.includes(difficulty.toLowerCase())) {
+        difficulty = prompt('Make sure to choose a valid difficulty. Which one would you like to play on? ');
+    };
+
     return difficulty;
 };
 
@@ -215,7 +209,8 @@ const gameEngine = (obj) => {
 // playing the game asks the user for a difficulty, then generates an appropriate field, starts the timer and runs the game engine
 const playGame = () => {
     let choice = askDifficulty();
-    let gameField = new Field(Field.generateField(fieldSize(), fieldSize(), choice));
+    console.log('Loading...');
+    let gameField = new Field(Field.generateField(12, 12, choice));
     startTime = Date.now();
     gameEngine(gameField);
 };
