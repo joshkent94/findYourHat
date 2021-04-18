@@ -30,12 +30,27 @@ class Field {
         let generatedField = [];
 
         // generates a random field with the given number of rows and cols
-        const fieldCreation = (rows, cols) => { 
+        // holes are chosen with probability dictated by the bound
+        const fieldCreation = (rows, cols, choice) => { 
             let arr = [];
+            let bound = 0;
+
+            if(choice === 'easy') {
+                bound = 25;
+            } else if( choice === 'intermediate') {
+                bound = 35;
+            } else {
+                bound = 45;
+            };
+
             for (let i = 0; i < rows; i++) {
                 let row = [];
                 for (let j = 0; j < cols; j++) {
-                    row.push(validCharacters[Math.floor(Math.random() * validCharacters.length)]);
+                    if((Math.floor(Math.random() * 100)) < bound) {
+                        row.push(validCharacters[0]);
+                    } else {
+                        row.push(validCharacters[1]);
+                    };
                 };
                 arr.push(row);
             };
@@ -56,36 +71,26 @@ class Field {
             return arr;
         };
 
-        // checks whether the generated field has more than a certain number of
-        // holes and keeps generating the field until it doesn't
-        const generateEasyField = (arr, rows, cols) => {
-            while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*30 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*25) {
-                arr = fieldCreation(rows, cols);
-            };
-            return arr;
+        // generates a field of certain difficulty
+        const generateEasyField = (rows, cols) => {
+            return fieldCreation(rows, cols, 'easy');
         }
 
-        const generateIntermediateField = (arr, rows, cols) => {
-            while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*35 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*30) {
-                arr = fieldCreation(rows, cols);
-            };
-            return arr;
+        const generateIntermediateField = (rows, cols) => {
+            return fieldCreation(rows, cols, 'intermediate');
         }
 
-        const generateHardField = (arr, rows, cols) => {
-            while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*40 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*35) {
-                arr = fieldCreation(rows, cols);
-            };
-            return arr;
+        const generateHardField = (rows, cols) => {
+            return fieldCreation(rows, cols, 'hard');
         }
 
-        // generates the field given the player's choice of difficulty
+        // decides which difficulty to use based on user input
         if(choice === 'easy') {
-            generatedField = generateEasyField(fieldCreation(rows, cols), rows, cols);
+            generatedField = generateEasyField(rows, cols);
         } else if(choice === 'intermediate') {
-            generatedField = generateIntermediateField(fieldCreation(rows, cols), rows, cols);
+            generatedField = generateIntermediateField(rows, cols);
         } else if(choice === 'hard') {
-            generatedField = generateHardField(fieldCreation(rows, cols), rows, cols);
+            generatedField = generateHardField(rows, cols);
         };
 
         return generatedField;
@@ -93,7 +98,6 @@ class Field {
 }
 
 // returns a random value between 10 and 20 to be used for the field size
-// no longer used, field size set to 12 * 12
 const fieldSize = () => {
     let size = Math.floor(Math.random() * 21);
     while(size < 10) {
@@ -115,7 +119,7 @@ let numberOfHoles = (arr, rows, cols) => {
     return holeSum;
 };
 
-// ask for a direction until a valid direction is given
+// asks for a direction until a valid direction is given
 const askDirection = () => {
     let direction = prompt('Which way would you like to go, up, down, left or right? ');
 
@@ -126,7 +130,7 @@ const askDirection = () => {
     return direction;
 };
 
-// ask the player for a difficulty until a valid difficulty is given
+// asks the player for a difficulty until a valid difficulty is given
 const askDifficulty = () => {
     let difficulty = prompt('Which difficulty would you like to play on, easy, intermediate or hard? ');
 
@@ -137,7 +141,7 @@ const askDifficulty = () => {
     return difficulty;
 };
 
-// check whether game has been won
+// checks whether game has been won
 const checkWin = (pos) => {
     if(pos === hat) {
         return true;
@@ -146,7 +150,7 @@ const checkWin = (pos) => {
     }
 };
 
-// check whether game has been lost
+// checks whether game has been lost
 const checkLoss = (pos) => {
     if(pos === hole) {
         return true;
@@ -155,7 +159,7 @@ const checkLoss = (pos) => {
     }
 };
 
-// amend the field based on the given direction
+// amends the field based on the given direction
 // but if the given direction leads to a win or loss then print a relevant message
 const amendField = (arr, dir) => {
     if(dir === 'up') {
@@ -210,8 +214,7 @@ const gameEngine = (obj) => {
 // playing the game asks the user for a difficulty, then generates an appropriate field, starts the timer and runs the game engine
 const playGame = () => {
     let choice = askDifficulty();
-    console.log('Loading...');
-    let gameField = new Field(Field.generateField(12, 12, choice));
+    let gameField = new Field(Field.generateField(fieldSize(), fieldSize(), choice));
     startTime = Date.now();
     gameEngine(gameField);
 };
