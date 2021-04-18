@@ -1,4 +1,5 @@
 const prompt = require('prompt-sync')({sigint: true});
+const term = require('terminal-kit').terminal;
 
 const hat = '^';
 const hole = 'O';
