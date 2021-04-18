@@ -1,11 +1,12 @@
 const prompt = require('prompt-sync')({sigint: true});
+const term = require('terminal-kit').terminal;
 
 const hat = '^';
 const hole = 'O';
 const fieldCharacter = '░';
 const pathCharacter = '*';
 const validDirections = ['up', 'down', 'left', 'right'];
-const validDifficulties = ['easy', 'intermediate', 'hard'];
+const difficulties = ['Easy', 'Intermediate', 'Hard'];
 const validCharacters = [hole, fieldCharacter];
 let gameEnd = false;
 let startTime = 0;
@@ -126,12 +127,18 @@ const askDirection = () => {
 
 // ask the player for a difficulty until a valid difficulty is given
 const askDifficulty = () => {
-    let difficulty = prompt('Which difficulty would you like to play on, easy, intermediate or hard? ')
-
-    while(!validDifficulties.includes(difficulty.toLowerCase())) {
-        difficulty = prompt('Make sure to choose a valid difficulty. Which one would you like to play on? ');
-    };
-
+    let difficulty = 0;
+    term.singleColumnMenu(difficulties, function( error , response ) {
+        term( '\n' ).eraseLineAfter.green(
+            "#%s selected: %s (%s,%s)\n" ,
+            response.selectedIndex ,
+            response.selectedText ,
+            response.x ,
+            response.y
+        ) ;
+        process.exit() ;
+    } ) ;
+    ;
     return difficulty;
 };
 
@@ -208,7 +215,7 @@ const gameEngine = (obj) => {
 // playing the game asks the user for a difficulty, then generates an appropriate field, starts the timer and runs the game engine
 const playGame = () => {
     let choice = askDifficulty();
-    let gameField = new Field(Field.generateField(10, 10, choice));
+    let gameField = new Field(Field.generateField(fieldSize(), fieldSize(), choice));
     startTime = Date.now();
     gameEngine(gameField);
 };
