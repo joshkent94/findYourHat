@@ -19,7 +19,7 @@ I was inspired to create this app as part of my full stack developer course on C
 * Node.js
 
 ## Setup
-An installation of Node.js is required to run the app.
+An installation of Node.js is required to run the app, the simply open the main.js file in the terminal.
 
 ## Features
 Features ready:
