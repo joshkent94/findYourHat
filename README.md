@@ -24,6 +24,8 @@ An installation of Node.js is required to run the app, then simply open the main
 ## Features
 Features ready:
 * A simplistic game whereby you have to find your hat from the given start position without falling down any holes.
+* Difficulty selection.
+* Game timer lets you know how quickly you solved the puzzle.
 
 To-do list:
 * Improve the interactivity and graphics.
