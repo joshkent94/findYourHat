@@ -5,8 +5,11 @@ const hole = 'O';
 const fieldCharacter = '░';
 const pathCharacter = '*';
 const validDirections = ['up', 'down', 'left', 'right'];
+const validDifficulties = ['easy', 'intermediate', 'hard'];
 const validCharacters = [hole, fieldCharacter];
 let gameEnd = false;
+let startTime = 0;
+let endTime = 0;
 let currentRow = 0;
 let currentColumn = 0;
 
@@ -21,39 +24,93 @@ class Field {
         }
     }
 
-    static generateField(rows, cols) {
-        let arr = [];
-        for (let i = 0; i < rows; i++) {
-            let row = [];
-            for (let j = 0; j < cols; j++) {
-                row.push(validCharacters[Math.floor(Math.random() * validCharacters.length)]);
+    static generateField(rows, cols, choice) {
+
+        let generatedField = [];
+
+        // generates a random field with the given number of rows and cols
+        const fieldCreation = (rows, cols) => { 
+            let arr = [];
+            for (let i = 0; i < rows; i++) {
+                let row = [];
+                for (let j = 0; j < cols; j++) {
+                    row.push(validCharacters[Math.floor(Math.random() * validCharacters.length)]);
+                };
+                arr.push(row);
             };
-            arr.push(row);
+
+            currentRow = Math.floor(Math.random() * rows);
+            currentColumn = Math.floor(Math.random() * cols); 
+            arr[currentRow][currentColumn] = pathCharacter;
+
+            let winningRow = Math.floor(Math.random() * rows);
+            let winningColumn = Math.floor(Math.random() * cols);
+
+            while(arr[winningRow][winningColumn] === pathCharacter) {
+                winningRow = Math.floor(Math.random() * rows);
+                winningColumn = Math.floor(Math.random() * cols);
+            };
+            arr[winningRow][winningColumn] = hat;
+
+            return arr;
         };
 
-        currentRow = Math.floor(Math.random() * rows);
-        currentColumn = Math.floor(Math.random() * cols); 
-        arr[currentRow][currentColumn] = pathCharacter;
+        // checks whether the generated field has more than a certain number of
+        // holes and keeps generating the field until it doesn't
+        const generateEasyField = (arr, rows, cols) => {
+            while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*25 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*20) {
+                arr = fieldCreation(rows, cols);
+            };
+            return arr;
+        }
 
-        let winningRow = Math.floor(Math.random() * rows);
-        let winningColumn = Math.floor(Math.random() * cols);
+        const generateIntermediateField = (arr, rows, cols) => {
+            while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*30 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*25) {
+                arr = fieldCreation(rows, cols);
+            };
+            return arr;
+        }
 
-        while(arr[winningRow][winningColumn] === pathCharacter) {
-            winningRow = Math.floor(Math.random() * rows);
-            winningColumn = Math.floor(Math.random() * cols);
+        const generateHardField = (arr, rows, cols) => {
+            while(numberOfHoles(arr, rows, cols) > ((rows * cols)/100)*35 || numberOfHoles(arr, rows, cols) <= ((rows * cols)/100)*30) {
+                arr = fieldCreation(rows, cols);
+            };
+            return arr;
+        }
+
+        // generates the field given the player's choice of difficulty
+        if(choice === 'easy') {
+            generatedField = generateEasyField(fieldCreation(rows, cols), rows, cols);
+        } else if(choice === 'intermediate') {
+            generatedField = generateIntermediateField(fieldCreation(rows, cols), rows, cols);
+        } else if(choice === 'hard') {
+            generatedField = generateHardField(fieldCreation(rows, cols), rows, cols);
         };
-        arr[winningRow][winningColumn] = hat;
-        return arr;
+
+        return generatedField;
     }
 }
 
-// returns a random value between 3 and 9 to be used for the field size
+// returns a random value between 10 and 20 to be used for the field size
 const fieldSize = () => {
-    let size = Math.floor(Math.random() * 10);
-    if(size < 3) {
-        size += 3;
+    let size = Math.floor(Math.random() * 21);
+    while(size < 10) {
+        size = Math.floor(Math.random() * 21);
     };
     return size;
+};
+
+// calculates the number of holes in a given field
+let numberOfHoles = (arr, rows, cols) => {
+    let holeSum = 0;
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            if(arr[i][j] === hole) {
+                holeSum++;
+            };
+        };
+    };
+    return holeSum;
 };
 
 // ask for a direction until a valid direction is given
@@ -65,6 +122,17 @@ const askDirection = () => {
     };
 
     return direction;
+};
+
+// ask the player for a difficulty until a valid difficulty is given
+const askDifficulty = () => {
+    let difficulty = prompt('Which difficulty would you like to play on, easy, intermediate or hard? ')
+
+    while(!validDifficulties.includes(difficulty.toLowerCase())) {
+        difficulty = prompt('Make sure to choose a valid difficulty. Which one would you like to play on? ');
+    };
+
+    return difficulty;
 };
 
 // check whether game has been won
@@ -114,19 +182,22 @@ const amendField = (arr, dir) => {
         };
     };
     if(checkWin(arr[currentRow][currentColumn])) {
-        console.log('Congratulations, you found your hat!');
         gameEnd = true;
+        endTime = Date.now();
+        const timeElapsed = endTime - startTime;
+        console.log(`Congratulations, you found your hat in ${(timeElapsed/1000).toFixed(2)} seconds.`);
     } else if(checkLoss(arr[currentRow][currentColumn])) {
-        console.log('Looks like you fell down a hole!');
         gameEnd = true;
+        endTime = Date.now();
+        const timeElapsed = endTime - startTime;
+        console.log(`Looks like you took ${(timeElapsed/1000).toFixed(2)} seconds to fall down a hole!`);
     };
     arr[currentRow][currentColumn] = pathCharacter;
     return;
 };
 
-// play the game by asking for a direction and amending the field accordingly
-// until the game ends
-const playGame = (obj) => {
+// the game engine prints the field, asks for directions and moves the player round until the game ends
+const gameEngine = (obj) => {
     while(!gameEnd) {
         obj.print();
         let dir = askDirection();
@@ -134,4 +205,12 @@ const playGame = (obj) => {
     };
 };
 
-playGame(new Field(Field.generateField(fieldSize(), fieldSize())));
+// playing the game asks the user for a difficulty, then generates an appropriate field, starts the timer and runs the game engine
+const playGame = () => {
+    let choice = askDifficulty();
+    let gameField = new Field(Field.generateField(10, 10, choice));
+    startTime = Date.now();
+    gameEngine(gameField);
+};
+
+playGame();
