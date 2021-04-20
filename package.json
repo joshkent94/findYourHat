@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "description": "A terminal maze-solving game.",
   "main": "main.js",
+  "scripts": {
+    "test": "mocha"
+  },
   "author": "Codecademy",
   "license": "ISC",
   "dependencies": {
     "prompt-sync": "^4.2.0",
     "terminal-kit": "^2.0.7"
+  },
+  "devDependencies": {
+    "mocha": "^8.3.2"
   }
 }
