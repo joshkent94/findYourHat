@@ -4,7 +4,7 @@
   "description": "A terminal maze-solving game.",
   "main": "main.js",
   "scripts": {
-    "test": "moch"
+    "test": "mocha"
   },
   "author": "Codecademy",
   "license": "ISC",
