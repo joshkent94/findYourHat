@@ -121,21 +121,21 @@ let numberOfHoles = (arr, rows, cols) => {
 
 // asks for a direction until a valid direction is given
 const askDirection = () => {
-    let direction = prompt('Which way would you like to go, up, down, left or right? ');
+    let direction = prompt(term.colorRgb(0x33, 0xff, 0x88, "Which way would you like to go, up, down, left or right? "));
 
     while(!validDirections.includes(direction.toLowerCase())) {
-        direction = prompt('Make sure to choose a direction. Which way do you want to go? ');
+        direction = prompt(term.colorRgb(0x33, 0xff, 0x88, 'Make sure to choose a direction. Which way do you want to go? '));
     };
 
     return direction;
 };
 
-// asks the player for a difficulty until a valid difficulty is given
+// asks the player for a difficulty until a valid difficulty is given --- NO LONGER USED
 const askDifficulty = () => {
-    let difficulty = prompt('Which difficulty would you like to play on, easy, intermediate or hard? ');
+    let difficulty = prompt(term.colorRgb(0x33, 0xff, 0x88, "Which difficulty would you like to play on, easy, intermediate or hard? "));
 
     while(!difficulties.includes(difficulty.toLowerCase())) {
-        difficulty = prompt('Make sure to choose a valid difficulty. Which one would you like to play on? ');
+        difficulty = prompt(term.colorRgb(0x33, 0xff, 0x88, "Make sure to choose a valid difficulty. Which one would you like to play on? "));
     };
 
     return difficulty;
@@ -165,58 +165,72 @@ const amendField = (arr, dir) => {
     if(dir === 'up') {
         if(currentRow > 0) {
             currentRow -= 1;
-        } else {
-            console.log("You can't go up!");
         };
     } else if(dir === 'down') {
         if(currentRow < arr.length - 1) {
             currentRow += 1;
-        } else {
-            console.log("You can't go down!");
         };
     } else if(dir === 'left') {
         if(currentColumn > 0) {
             currentColumn -= 1;
-        } else {
-            console.log("You can't go left!");
         };
     } else if(dir === 'right'){
         if(currentColumn < arr[currentRow].length - 1) {
             currentColumn += 1;
-        } else {
-            console.log("You can't go right!");
         };
     };
     if(checkWin(arr[currentRow][currentColumn])) {
         gameEnd = true;
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
-        console.log(`Congratulations, you found your hat in ${(timeElapsed/1000).toFixed(2)} seconds.`);
+        term.colorRgb(0x33, 0xff, 0x88, `Congratulations, you found your hat in ${(timeElapsed/1000).toFixed(2)} seconds.`);
     } else if(checkLoss(arr[currentRow][currentColumn])) {
         gameEnd = true;
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
-        console.log(`Looks like you took ${(timeElapsed/1000).toFixed(2)} seconds to fall down a hole!`);
+        term.colorRgb(0x33, 0xff, 0x88, `Looks like you took ${(timeElapsed/1000).toFixed(2)} seconds to fall down a hole!`);
     };
     arr[currentRow][currentColumn] = pathCharacter;
-    return;
 };
 
-// the game engine prints the field, asks for directions and moves the player round until the game ends
+// the game engine clears the display, prints the field, asks for directions and moves the player round until the game ends
 const gameEngine = (obj) => {
     while(!gameEnd) {
+        term.clear();
         obj.print();
         let dir = askDirection();
         amendField(obj.field, dir);
     };
 };
 
-// playing the game asks the user for a difficulty, then generates an appropriate field, starts the timer and runs the game engine
+// uses a column menu to select the difficulty, clears the screen, then generates a field using that difficulty,
+// creates a loading screen for 3 seconds, then counts down 3 seconds until the game starts, starts the game timer and runs the game engine
 const playGame = () => {
-    let choice = askDifficulty();
-    let gameField = new Field(Field.generateField(fieldSize(), fieldSize(), choice));
-    startTime = Date.now();
-    gameEngine(gameField);
+    term.colorRgb(0x33, 0xff, 0x88, "Welcome to Find My Hat! The aim of the game is to find your hat without falling down the holes.");
+    term.nextLine(1).colorRgb(0x33, 0xff, 0x88, "When you're ready, pick a difficulty to play on:");
+    term.singleColumnMenu(difficulties, (error, response) => {
+        let difficulty = response.selectedText;
+        let gameField = new Field(Field.generateField(fieldSize(), fieldSize(), difficulty));
+        term.clear();
+        term.colorRgb(0x33, 0xff, 0x88, "Loading...");
+        setTimeout(() => {
+            term.clear();
+            term.colorRgb(0x33, 0xff, 0x88, "Get ready to play in... 3");
+            setTimeout(() => {
+                term.clear();
+                term.colorRgb(0x33, 0xff, 0x88, "Get ready to play in... 2");
+                setTimeout(() => {
+                    term.clear();
+                    term.colorRgb(0x33, 0xff, 0x88, "Get ready to play in... 1");
+                    setTimeout(() => {
+                        startTime = Date.now();
+                        gameEngine(gameField);
+                        process.exit();
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        }, 3000);
+    });
 };
 
 playGame();
