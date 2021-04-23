@@ -9,10 +9,10 @@ const validDirections = ['up', 'down', 'left', 'right'];
 const difficulties = ['easy', 'intermediate', 'hard'];
 const validCharacters = [hole, fieldCharacter];
 let gameEnd = false;
-let startTime = 0;
-let endTime = 0;
-let currentRow = 0;
-let currentColumn = 0;
+let startTime;
+let endTime;
+let currentRow;
+let currentColumn;
 
 class Field {
     constructor(arr) {
@@ -119,7 +119,7 @@ let numberOfHoles = (arr, rows, cols) => {
     return holeSum;
 };
 
-// asks for a direction until a valid direction is given
+// asks for a direction until a valid direction is given --- NO LONGER USED
 const askDirection = () => {
     let direction = prompt(term.colorRgb(0x33, 0xff, 0x88, "Which way would you like to go, up, down, left or right? "));
 
@@ -215,13 +215,16 @@ const playGame = () => {
         term.colorRgb(0x33, 0xff, 0x88, "Loading...");
         setTimeout(() => {
             term.clear();
+            gameField.print();
             term.colorRgb(0x33, 0xff, 0x88, "Get ready to play in... 3");
             setTimeout(() => {
-                term.clear();
-                term.colorRgb(0x33, 0xff, 0x88, "Get ready to play in... 2");
+                term.left(1);
+                term.delete(1);
+                term.colorRgb(0x33, 0xff, 0x88, "2");
                 setTimeout(() => {
-                    term.clear();
-                    term.colorRgb(0x33, 0xff, 0x88, "Get ready to play in... 1");
+                    term.left(1);
+                    term.delete(1);
+                    term.colorRgb(0x33, 0xff, 0x88, "1");
                     setTimeout(() => {
                         startTime = Date.now();
                         gameEngine(gameField);
@@ -234,3 +237,25 @@ const playGame = () => {
 };
 
 playGame();
+
+// term.grabInput();
+// term.on('key', (key) => {
+//     switch (key) {
+//         case 'UP':
+//             dir === 'up';
+//             break;
+//         case 'DOWN':
+//             dir === 'down';
+//             break;
+//         case 'LEFT':
+//             dir === 'left';
+//             break;
+//         case 'RIGHT':
+//             dir === 'right';
+//             break;
+//         case 'CTRL_C':
+//             process.exit();
+//         default:
+//             break;
+//     };
+// });
