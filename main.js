@@ -97,7 +97,7 @@ class Field {
     }
 }
 
-// returns a random value between 10 and 20 to be used for the field size
+// returns a random value between 10 and 20 to be used for the field size --- NO LONGER USED
 const fieldSize = () => {
     let size = Math.floor(Math.random() * 21);
     while(size < 10) {
@@ -162,19 +162,19 @@ const checkLoss = (pos) => {
 // amends the field based on the given direction
 // but if the given direction leads to a win or loss then print a relevant message
 const amendField = (arr, dir) => {
-    if(dir === 'up') {
+    if(dir === 'UP') {
         if(currentRow > 0) {
             currentRow -= 1;
         };
-    } else if(dir === 'down') {
+    } else if(dir === 'DOWN') {
         if(currentRow < arr.length - 1) {
             currentRow += 1;
         };
-    } else if(dir === 'left') {
+    } else if(dir === 'LEFT') {
         if(currentColumn > 0) {
             currentColumn -= 1;
         };
-    } else if(dir === 'right'){
+    } else if(dir === 'RIGHT'){
         if(currentColumn < arr[currentRow].length - 1) {
             currentColumn += 1;
         };
@@ -184,33 +184,60 @@ const amendField = (arr, dir) => {
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
         term.colorRgb(0x33, 0xff, 0x88, `Congratulations, you found your hat in ${(timeElapsed/1000).toFixed(2)} seconds.`);
+        process.exit();
     } else if(checkLoss(arr[currentRow][currentColumn])) {
         gameEnd = true;
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
         term.colorRgb(0x33, 0xff, 0x88, `Looks like you took ${(timeElapsed/1000).toFixed(2)} seconds to fall down a hole!`);
+        process.exit();
     };
     arr[currentRow][currentColumn] = pathCharacter;
 };
 
-// the game engine clears the display, prints the field, asks for directions and moves the player round until the game ends
+// the game engine prints the field, starts the game timer and listens for direction inputs before feeding the inputs into amendField
 const gameEngine = (obj) => {
-    while(!gameEnd) {
-        term.clear();
-        obj.print();
-        let dir = askDirection();
-        amendField(obj.field, dir);
-    };
+    obj.print();
+    startTime = Date.now();
+    term.grabInput();
+        term.on('key', (key) => {
+            switch (key) {
+                case 'UP':
+                    amendField(obj.field, key);
+                    term.clear();
+                    obj.print();
+                    break;
+                case 'DOWN':
+                    amendField(obj.field, key);
+                    term.clear();
+                    obj.print();
+                    break;
+                case 'LEFT':
+                    amendField(obj.field, key);
+                    term.clear();
+                    obj.print();
+                    break;
+                case 'RIGHT':
+                    amendField(obj.field, key);
+                    term.clear();
+                    obj.print();
+                    break;
+                case 'CTRL_C':
+                    process.exit();
+                default:
+                    break;
+            };
+        });
 };
 
 // uses a column menu to select the difficulty, clears the screen, then generates a field using that difficulty,
-// creates a loading screen for 3 seconds, then counts down 3 seconds until the game starts, starts the game timer and runs the game engine
+// creates a loading screen for 3 seconds, then counts down 3 seconds until the game starts, clears the display and runs the game engine
 const playGame = () => {
     term.colorRgb(0x33, 0xff, 0x88, "Welcome to Find My Hat! The aim of the game is to find your hat without falling down the holes.");
     term.nextLine(1).colorRgb(0x33, 0xff, 0x88, "When you're ready, pick a difficulty to play on:");
     term.singleColumnMenu(difficulties, (error, response) => {
         let difficulty = response.selectedText;
-        let gameField = new Field(Field.generateField(fieldSize(), fieldSize(), difficulty));
+        let gameField = new Field(Field.generateField(10, 10, difficulty));
         term.clear();
         term.colorRgb(0x33, 0xff, 0x88, "Loading...");
         setTimeout(() => {
@@ -226,9 +253,8 @@ const playGame = () => {
                     term.delete(1);
                     term.colorRgb(0x33, 0xff, 0x88, "1");
                     setTimeout(() => {
-                        startTime = Date.now();
+                        term.clear();
                         gameEngine(gameField);
-                        process.exit();
                     }, 1000);
                 }, 1000);
             }, 1000);
@@ -237,25 +263,3 @@ const playGame = () => {
 };
 
 playGame();
-
-// term.grabInput();
-// term.on('key', (key) => {
-//     switch (key) {
-//         case 'UP':
-//             dir === 'up';
-//             break;
-//         case 'DOWN':
-//             dir === 'down';
-//             break;
-//         case 'LEFT':
-//             dir === 'left';
-//             break;
-//         case 'RIGHT':
-//             dir === 'right';
-//             break;
-//         case 'CTRL_C':
-//             process.exit();
-//         default:
-//             break;
-//     };
-// });
