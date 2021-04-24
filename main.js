@@ -6,13 +6,18 @@ const hole = 'O';
 const fieldCharacter = '░';
 const pathCharacter = '*';
 const validDirections = ['up', 'down', 'left', 'right'];
-const difficulties = ['easy', 'intermediate', 'hard'];
+const difficulties = ['Easy', 'Intermediate', 'Hard'];
+const endGameOptions = ['Retry', 'New Level', 'Quit'];
 const validCharacters = [hole, fieldCharacter];
 let gameEnd = false;
 let startTime;
 let endTime;
 let currentRow;
 let currentColumn;
+let startRow;
+let startColumn;
+let gameField;
+let difficulty;
 
 class Field {
     constructor(arr) {
@@ -35,9 +40,9 @@ class Field {
             let arr = [];
             let bound = 0;
 
-            if(choice === 'easy') {
+            if(choice === 'Easy') {
                 bound = 20;
-            } else if( choice === 'intermediate') {
+            } else if( choice === 'Intermediate') {
                 bound = 25;
             } else {
                 bound = 30;
@@ -56,7 +61,9 @@ class Field {
             };
 
             currentRow = Math.floor(Math.random() * rows);
-            currentColumn = Math.floor(Math.random() * cols); 
+            currentColumn = Math.floor(Math.random() * cols);
+            startRow = currentRow;
+            startColumn = currentColumn;
             arr[currentRow][currentColumn] = pathCharacter;
 
             let winningRow = Math.floor(Math.random() * rows);
@@ -85,11 +92,11 @@ class Field {
         }
 
         // decides which difficulty to use based on user input
-        if(choice === 'easy') {
+        if(choice === 'Easy') {
             generatedField = generateEasyField(rows, cols);
-        } else if(choice === 'intermediate') {
+        } else if(choice === 'Intermediate') {
             generatedField = generateIntermediateField(rows, cols);
-        } else if(choice === 'hard') {
+        } else if(choice === 'Hard') {
             generatedField = generateHardField(rows, cols);
         };
 
@@ -161,6 +168,7 @@ const checkLoss = (pos) => {
 
 // amends the field based on the given direction
 // but if the given direction leads to a win or loss then print a relevant message
+// give retry, new level on same difficulty, and quit options
 const amendField = (arr, dir) => {
     if(dir === 'UP') {
         if(currentRow > 0) {
@@ -180,21 +188,20 @@ const amendField = (arr, dir) => {
         };
     };
     if(checkWin(arr[currentRow][currentColumn])) {
-        gameEnd = true;
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
-        term.moveTo(0, 21);
+        term.moveTo(0, 31);
         term.colorRgb(0x33, 0xff, 0x88, `Congratulations, you found your hat in ${(timeElapsed/1000).toFixed(2)} seconds.`);
+        gameEnd = true;
         process.exit();
     } else if(checkLoss(arr[currentRow][currentColumn])) {
-        gameEnd = true;
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
-        term.moveTo(0, 21);
+        term.moveTo(0, 31);
         term.colorRgb(0x33, 0xff, 0x88, `Looks like you took ${(timeElapsed/1000).toFixed(2)} seconds to fall down a hole!`);
+        gameEnd = true;
         process.exit();
     };
-    arr[currentRow][currentColumn] = pathCharacter;
 };
 
 // the game engine prints the field, starts the game timer and listens for direction inputs before feeding the inputs into amendField
@@ -207,29 +214,30 @@ const gameEngine = (obj) => {
             switch (key) {
                 case 'UP':
                     amendField(obj.field, key);
-                    term.clear();
-                    obj.print();
                     term.moveTo(currentColumn + 1, currentRow + 1);
+                    term.delete(1);
+                    term.insert(1);
                     break;
                 case 'DOWN':
                     amendField(obj.field, key);
-                    term.clear();
-                    obj.print();
                     term.moveTo(currentColumn + 1, currentRow + 1);
+                    term.delete(1);
+                    term.insert(1);
                     break;
                 case 'LEFT':
                     amendField(obj.field, key);
-                    term.clear();
-                    obj.print();
                     term.moveTo(currentColumn + 1, currentRow + 1);
+                    term.delete(1);
+                    term.insert(1);
                     break;
                 case 'RIGHT':
                     amendField(obj.field, key);
-                    term.clear();
-                    obj.print();
                     term.moveTo(currentColumn + 1, currentRow + 1);
+                    term.delete(1);
+                    term.insert(1);
                     break;
                 case 'CTRL_C':
+                    term.moveTo(0, 31);
                     process.exit();
                 default:
                     break;
@@ -243,8 +251,8 @@ const playGame = () => {
     term.colorRgb(0x33, 0xff, 0x88, "Welcome to Find My Hat! The aim of the game is to find your hat without falling down the holes.");
     term.nextLine(1).colorRgb(0x33, 0xff, 0x88, "When you're ready, pick a difficulty to play on:");
     term.singleColumnMenu(difficulties, (error, response) => {
-        let difficulty = response.selectedText;
-        let gameField = new Field(Field.generateField(20, 20, difficulty));
+        difficulty = response.selectedText;
+        gameField = new Field(Field.generateField(30, 100, difficulty));
         term.clear();
         term.colorRgb(0x33, 0xff, 0x88, "Loading...");
         setTimeout(() => {
