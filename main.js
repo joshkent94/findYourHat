@@ -7,17 +7,12 @@ const fieldCharacter = '░';
 const pathCharacter = '*';
 const validDirections = ['up', 'down', 'left', 'right'];
 const difficulties = ['Easy', 'Intermediate', 'Hard'];
-const endGameOptions = ['Retry', 'New Level', 'Quit'];
 const validCharacters = [hole, fieldCharacter];
 let gameEnd = false;
 let startTime;
 let endTime;
 let currentRow;
 let currentColumn;
-let startRow;
-let startColumn;
-let gameField;
-let difficulty;
 
 class Field {
     constructor(arr) {
@@ -62,8 +57,6 @@ class Field {
 
             currentRow = Math.floor(Math.random() * rows);
             currentColumn = Math.floor(Math.random() * cols);
-            startRow = currentRow;
-            startColumn = currentColumn;
             arr[currentRow][currentColumn] = pathCharacter;
 
             let winningRow = Math.floor(Math.random() * rows);
@@ -80,15 +73,15 @@ class Field {
 
         // generates a field of certain difficulty
         const generateEasyField = (rows, cols) => {
-            return fieldCreation(rows, cols, 'easy');
+            return fieldCreation(rows, cols, 'Easy');
         }
 
         const generateIntermediateField = (rows, cols) => {
-            return fieldCreation(rows, cols, 'intermediate');
+            return fieldCreation(rows, cols, 'Intermediate');
         }
 
         const generateHardField = (rows, cols) => {
-            return fieldCreation(rows, cols, 'hard');
+            return fieldCreation(rows, cols, 'Hard');
         }
 
         // decides which difficulty to use based on user input
@@ -251,8 +244,8 @@ const playGame = () => {
     term.colorRgb(0x33, 0xff, 0x88, "Welcome to Find My Hat! The aim of the game is to find your hat without falling down the holes.");
     term.nextLine(1).colorRgb(0x33, 0xff, 0x88, "When you're ready, pick a difficulty to play on:");
     term.singleColumnMenu(difficulties, (error, response) => {
-        difficulty = response.selectedText;
-        gameField = new Field(Field.generateField(30, 100, difficulty));
+        let difficulty = response.selectedText;
+        let gameField = new Field(Field.generateField(30, 100, difficulty));
         term.clear();
         term.colorRgb(0x33, 0xff, 0x88, "Loading...");
         setTimeout(() => {
