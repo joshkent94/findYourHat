@@ -14,6 +14,9 @@
 ## General info
 I was inspired to create this app as part of my full stack developer course on Codecademy.
 
+## Screenshot
+![Screenshot of app working](./pictures/findMyHatScreenshot.png)
+
 ## Technologies
 * Javascript
 * Node.js
@@ -26,6 +29,7 @@ Features ready:
 * A simplistic game whereby you have to find your hat from the given start position without falling down any holes.
 * Difficulty selection.
 * Game timer lets you know how quickly you solved the puzzle.
+* Use the keyboard direction keys to move.
 
 To-do list:
 * Improve the interactivity and graphics.
