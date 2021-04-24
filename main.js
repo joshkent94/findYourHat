@@ -98,48 +98,48 @@ class Field {
 }
 
 // returns a random value between 10 and 20 to be used for the field size --- NO LONGER USED
-const fieldSize = () => {
-    let size = Math.floor(Math.random() * 21);
-    while(size < 10) {
-        size = Math.floor(Math.random() * 21);
-    };
-    return size;
-};
+// const fieldSize = () => {
+//     let size = Math.floor(Math.random() * 21);
+//     while(size < 10) {
+//         size = Math.floor(Math.random() * 21);
+//     };
+//     return size;
+// };
 
-// calculates the number of holes in a given field
-let numberOfHoles = (arr, rows, cols) => {
-    let holeSum = 0;
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            if(arr[i][j] === hole) {
-                holeSum++;
-            };
-        };
-    };
-    return holeSum;
-};
+// calculates the number of holes in a given field --- NO LONGER USED
+// let numberOfHoles = (arr, rows, cols) => {
+//     let holeSum = 0;
+//     for (let i = 0; i < rows; i++) {
+//         for (let j = 0; j < cols; j++) {
+//             if(arr[i][j] === hole) {
+//                 holeSum++;
+//             };
+//         };
+//     };
+//     return holeSum;
+// };
 
 // asks for a direction until a valid direction is given --- NO LONGER USED
-const askDirection = () => {
-    let direction = prompt(term.colorRgb(0x33, 0xff, 0x88, "Which way would you like to go, up, down, left or right? "));
+// const askDirection = () => {
+//     let direction = prompt(term.colorRgb(0x33, 0xff, 0x88, "Which way would you like to go, up, down, left or right? "));
 
-    while(!validDirections.includes(direction.toLowerCase())) {
-        direction = prompt(term.colorRgb(0x33, 0xff, 0x88, 'Make sure to choose a direction. Which way do you want to go? '));
-    };
+//     while(!validDirections.includes(direction.toLowerCase())) {
+//         direction = prompt(term.colorRgb(0x33, 0xff, 0x88, 'Make sure to choose a direction. Which way do you want to go? '));
+//     };
 
-    return direction;
-};
+//     return direction;
+// };
 
 // asks the player for a difficulty until a valid difficulty is given --- NO LONGER USED
-const askDifficulty = () => {
-    let difficulty = prompt(term.colorRgb(0x33, 0xff, 0x88, "Which difficulty would you like to play on, easy, intermediate or hard? "));
+// const askDifficulty = () => {
+//     let difficulty = prompt(term.colorRgb(0x33, 0xff, 0x88, "Which difficulty would you like to play on, easy, intermediate or hard? "));
 
-    while(!difficulties.includes(difficulty.toLowerCase())) {
-        difficulty = prompt(term.colorRgb(0x33, 0xff, 0x88, "Make sure to choose a valid difficulty. Which one would you like to play on? "));
-    };
+//     while(!difficulties.includes(difficulty.toLowerCase())) {
+//         difficulty = prompt(term.colorRgb(0x33, 0xff, 0x88, "Make sure to choose a valid difficulty. Which one would you like to play on? "));
+//     };
 
-    return difficulty;
-};
+//     return difficulty;
+// };
 
 // checks whether game has been won
 const checkWin = (pos) => {
@@ -159,9 +159,8 @@ const checkLoss = (pos) => {
     }
 };
 
-// amends the field based on the given direction
-// but if the given direction leads to a win or loss then print a relevant message
-// give retry, new level on same difficulty, and quit options
+// amends the field based on the given direction but if the given direction
+// leads to a win or loss then print a relevant message and end the game
 const amendField = (arr, dir) => {
     if(dir === 'UP') {
         if(currentRow > 0) {
