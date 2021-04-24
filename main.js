@@ -36,11 +36,11 @@ class Field {
             let bound = 0;
 
             if(choice === 'easy') {
-                bound = 25;
+                bound = 20;
             } else if( choice === 'intermediate') {
-                bound = 35;
+                bound = 25;
             } else {
-                bound = 45;
+                bound = 30;
             };
 
             for (let i = 0; i < rows; i++) {
@@ -183,12 +183,14 @@ const amendField = (arr, dir) => {
         gameEnd = true;
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
+        term.moveTo(0, 21);
         term.colorRgb(0x33, 0xff, 0x88, `Congratulations, you found your hat in ${(timeElapsed/1000).toFixed(2)} seconds.`);
         process.exit();
     } else if(checkLoss(arr[currentRow][currentColumn])) {
         gameEnd = true;
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
+        term.moveTo(0, 21);
         term.colorRgb(0x33, 0xff, 0x88, `Looks like you took ${(timeElapsed/1000).toFixed(2)} seconds to fall down a hole!`);
         process.exit();
     };
@@ -200,27 +202,32 @@ const gameEngine = (obj) => {
     obj.print();
     startTime = Date.now();
     term.grabInput();
+    term.moveTo(currentColumn + 1, currentRow + 1);
         term.on('key', (key) => {
             switch (key) {
                 case 'UP':
                     amendField(obj.field, key);
                     term.clear();
                     obj.print();
+                    term.moveTo(currentColumn + 1, currentRow + 1);
                     break;
                 case 'DOWN':
                     amendField(obj.field, key);
                     term.clear();
                     obj.print();
+                    term.moveTo(currentColumn + 1, currentRow + 1);
                     break;
                 case 'LEFT':
                     amendField(obj.field, key);
                     term.clear();
                     obj.print();
+                    term.moveTo(currentColumn + 1, currentRow + 1);
                     break;
                 case 'RIGHT':
                     amendField(obj.field, key);
                     term.clear();
                     obj.print();
+                    term.moveTo(currentColumn + 1, currentRow + 1);
                     break;
                 case 'CTRL_C':
                     process.exit();
@@ -237,7 +244,7 @@ const playGame = () => {
     term.nextLine(1).colorRgb(0x33, 0xff, 0x88, "When you're ready, pick a difficulty to play on:");
     term.singleColumnMenu(difficulties, (error, response) => {
         let difficulty = response.selectedText;
-        let gameField = new Field(Field.generateField(10, 10, difficulty));
+        let gameField = new Field(Field.generateField(20, 20, difficulty));
         term.clear();
         term.colorRgb(0x33, 0xff, 0x88, "Loading...");
         setTimeout(() => {
