@@ -8,11 +8,12 @@ const pathCharacter = '*';
 const validDirections = ['up', 'down', 'left', 'right'];
 const difficulties = ['Easy', 'Intermediate', 'Hard'];
 const validCharacters = [hole, fieldCharacter];
-let gameEnd = false;
 let startTime;
 let endTime;
 let currentRow;
 let currentColumn;
+let difficulty;
+let gameField;
 
 class Field {
     constructor(arr) {
@@ -184,14 +185,12 @@ const amendField = (arr, dir) => {
         const timeElapsed = endTime - startTime;
         term.moveTo(0, 31);
         term.colorRgb(0x33, 0xff, 0x88, `Congratulations, you found your hat in ${(timeElapsed/1000).toFixed(2)} seconds.`);
-        gameEnd = true;
         process.exit();
     } else if(checkLoss(arr[currentRow][currentColumn])) {
         endTime = Date.now();
         const timeElapsed = endTime - startTime;
         term.moveTo(0, 31);
         term.colorRgb(0x33, 0xff, 0x88, `Looks like you took ${(timeElapsed/1000).toFixed(2)} seconds to fall down a hole!`);
-        gameEnd = true;
         process.exit();
     };
 };
@@ -243,8 +242,8 @@ const playGame = () => {
     term.colorRgb(0x33, 0xff, 0x88, "Welcome to Find My Hat! The aim of the game is to find your hat without falling down the holes.");
     term.nextLine(1).colorRgb(0x33, 0xff, 0x88, "When you're ready, pick a difficulty to play on:");
     term.singleColumnMenu(difficulties, (error, response) => {
-        let difficulty = response.selectedText;
-        let gameField = new Field(Field.generateField(30, 100, difficulty));
+        difficulty = response.selectedText;
+        gameField = new Field(Field.generateField(30, 100, difficulty));
         term.clear();
         term.colorRgb(0x33, 0xff, 0x88, "Loading...");
         setTimeout(() => {
